@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DIANTZY — Open 24 Jam</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#080b10;
+  --surface:#0f1420;
+  --card:#131929;
+  --border:rgba(0,200,255,0.12);
+  --accent:#00c8ff;
+  --accent2:#7b5cfa;
+  --gold:#f5c842;
+  --text:#e8edf5;
+  --muted:#5a6680;
+  --syne:'Syne',sans-serif;
+  --mono:'Space Mono',monospace;
+}
+
+html{scroll-behavior:smooth}
+body{font-family:var(--syne);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* NOISE TEXTURE */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:0.4;
+}
+
+/* GLOW BG */
+.glow-orb{
+  position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;
+}
+.glow-orb.one{width:500px;height:500px;background:rgba(0,200,255,0.06);top:-100px;left:-100px}
+.glow-orb.two{width:400px;height:400px;background:rgba(123,92,250,0.07);bottom:0;right:-50px}
+
+/* WRAPPER */
+.wrap{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:0 1.5rem 4rem}
+
+/* HEADER */
+header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1.5rem 0;
+  border-bottom:0.5px solid var(--border);
+  margin-bottom:3rem;
+}
+.logo{font-family:var(--mono);font-size:13px;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase}
+.badge-live{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:11px;
+  color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;
+}
+.dot-live{
+  width:8px;height:8px;background:var(--accent);border-radius:50%;
+  animation:pulse 1.5s ease infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,200,255,0.6)}50%{opacity:0.6;box-shadow:0 0 0 6px rgba(0,200,255,0)}}
+
+/* HERO */
+.hero{
+  display:flex;flex-direction:column;
+  padding:3.5rem 0 3rem;
+  border-bottom:0.5px solid var(--border);
+  margin-bottom:3rem;
+  opacity:0;animation:fadeUp 0.7s ease 0.1s forwards;
+}
+.hero-tag{
+  font-family:var(--mono);font-size:11px;letter-spacing:0.2em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:1.2rem;
+}
+.hero-name{
+  font-size:clamp(3rem,10vw,5.5rem);
+  font-weight:800;line-height:0.95;
+  letter-spacing:-0.02em;margin-bottom:1rem;
+}
+.hero-name span{
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-sub{
+  font-family:var(--mono);font-size:13px;color:var(--muted);
+  letter-spacing:0.05em;margin-bottom:2rem;
+}
+.hero-bio{
+  max-width:520px;font-size:1rem;line-height:1.85;
+  color:rgba(232,237,245,0.7);font-weight:400;
+}
+
+/* STATS ROW */
+.stats{
+  display:flex;gap:1px;background:var(--border);
+  border:0.5px solid var(--border);margin-bottom:3rem;
+  opacity:0;animation:fadeUp 0.7s ease 0.3s forwards;
+}
+.stat{
+  flex:1;background:var(--card);padding:1.5rem 1.25rem;
+  text-align:center;
+}
+.stat-num{
+  font-family:var(--mono);font-size:1.6rem;font-weight:700;
+  color:var(--accent);display:block;margin-bottom:0.3rem;
+}
+.stat-label{
+  font-family:var(--mono);font-size:10px;letter-spacing:0.15em;
+  text-transform:uppercase;color:var(--muted);
+}
+
+/* SECTION LABEL */
+.sec-label{
+  font-family:var(--mono);font-size:11px;letter-spacing:0.2em;
+  text-transform:uppercase;color:var(--accent);
+  margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;
+}
+.sec-label::after{content:'';flex:1;height:0.5px;background:var(--border)}
+
+/* SERVICES */
+.services{
+  margin-bottom:3rem;
+  opacity:0;animation:fadeUp 0.7s ease 0.4s forwards;
+}
+.service-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:0.5px solid var(--border)}
+.service-card{
+  background:var(--card);padding:1.75rem 1.5rem;
+  cursor:pointer;transition:background 0.25s,transform 0.2s;
+  position:relative;overflow:hidden;
+}
+.service-card::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,200,255,0.04),transparent);
+  opacity:0;transition:opacity 0.3s;
+}
+.service-card:hover{background:rgba(0,200,255,0.05)}
+.service-card:hover::after{opacity:1}
+.service-card:hover .s-icon{transform:scale(1.1)}
+.s-icon{
+  font-size:1.6rem;margin-bottom:1rem;display:block;
+  transition:transform 0.25s;
+}
+.s-title{font-size:1rem;font-weight:700;margin-bottom:0.4rem}
+.s-desc{font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.6}
+
+/* HIGHLIGHT: CV SALDO */
+.service-card.highlight{
+  background:rgba(245,200,66,0.05);
+  border:0.5px solid rgba(245,200,66,0.2);
+}
+.service-card.highlight .s-title{color:var(--gold)}
+.service-card.highlight .s-desc{color:rgba(245,200,66,0.5)}
+
+/* PROFILE */
+.profile-section{
+  margin-bottom:3rem;
+  opacity:0;animation:fadeUp 0.7s ease 0.5s forwards;
+}
+.profile-card{
+  background:var(--card);border:0.5px solid var(--border);
+  padding:2rem;display:flex;gap:2rem;align-items:flex-start;
+}
+.avatar{
+  width:72px;height:72px;flex-shrink:0;
+  border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;font-weight:800;color:#fff;
+  font-family:var(--mono);
+}
+.profile-info{}
+.profile-name{font-size:1.3rem;font-weight:700;margin-bottom:0.3rem}
+.profile-handle{
+  font-family:var(--mono);font-size:12px;color:var(--accent);
+  letter-spacing:0.1em;margin-bottom:0.75rem;
+}
+.profile-meta{display:flex;gap:1rem;flex-wrap:wrap}
+.meta-pill{
+  font-family:var(--mono);font-size:10px;letter-spacing:0.08em;
+  text-transform:uppercase;padding:0.3rem 0.75rem;
+  background:rgba(255,255,255,0.04);border:0.5px solid var(--border);
+  color:var(--muted);
+}
+.meta-pill.active{border-color:rgba(0,200,255,0.3);color:var(--accent)}
+
+/* INFO / LINK */
+.info-section{
+  margin-bottom:3rem;
+  opacity:0;animation:fadeUp 0.7s ease 0.6s forwards;
+}
+.info-card{
+  background:var(--card);border:0.5px solid var(--border);
+  padding:1.75rem 1.5rem;
+}
+.info-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0.9rem 0;border-bottom:0.5px solid var(--border);
+}
+.info-row:last-child{border-bottom:none}
+.info-key{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)}
+.info-val{font-family:var(--mono);font-size:12px;color:var(--text)}
+.info-val a{color:var(--accent);text-decoration:none;transition:opacity 0.2s}
+.info-val a:hover{opacity:0.7}
+
+/* CTA */
+.cta-section{
+  opacity:0;animation:fadeUp 0.7s ease 0.7s forwards;
+}
+.cta-card{
+  background:linear-gradient(135deg,rgba(0,200,255,0.08),rgba(123,92,250,0.08));
+  border:0.5px solid rgba(0,200,255,0.2);
+  padding:2.5rem;text-align:center;
+}
+.cta-title{font-size:1.5rem;font-weight:800;margin-bottom:0.75rem}
+.cta-sub{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:2rem;line-height:1.7}
+.cta-buttons{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.btn{
+  font-family:var(--mono);font-size:12px;letter-spacing:0.1em;
+  text-transform:uppercase;padding:0.85rem 2rem;
+  text-decoration:none;transition:all 0.25s;cursor:pointer;
+  border:none;display:inline-block;
+}
+.btn-accent{background:var(--accent);color:var(--bg);font-weight:700}
+.btn-accent:hover{background:#fff;color:var(--bg)}
+.btn-outline{border:0.5px solid var(--border);color:var(--muted);background:transparent}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:2rem;right:2rem;z-index:999;
+  background:var(--accent);color:var(--bg);
+  font-family:var(--mono);font-size:12px;letter-spacing:0.08em;
+  padding:0.85rem 1.5rem;
+  transform:translateY(80px);opacity:0;
+  transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events:none;
+}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* FOOTER */
+footer{
+  border-top:0.5px solid var(--border);
+  padding:1.5rem 0;margin-top:1rem;
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--mono);font-size:11px;color:var(--muted);
+  letter-spacing:0.08em;
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:600px){
+  .service-grid{grid-template-columns:1fr}
+  .profile-card{flex-direction:column;gap:1rem}
+  .stats{flex-wrap:wrap}
+  .stat{min-width:50%}
+  footer{flex-direction:column;gap:0.5rem;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="glow-orb one"></div>
+<div class="glow-orb two"></div>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">Diantzy.com</div>
+    <div class="badge-live"><div class="dot-live"></div>Open 24 Jam</div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="hero-tag"></p>
+    <h1 class="hero-name"><span>DIANTZY</span></h1>
+    <p class="hero-sub"> &nbsp;&nbsp;  &nbsp;&nbsp;</p>
+    <p class="hero-bio">
+      Perkenalkan, saya <strong>Andra</strong>, lebih dikenal sebagai <strong>Dian</strong> di lingkungan komunitas. Aktif sebagai Admin Isian sejak <strong>2021</strong> — sejak era Valdez. Telah menangani ratusan transaksi rekber isian dengan penuh tanggung jawab dan kepercayaan.
+    </p>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-num" id="cnt-tahun">0</span>
+      <span class="stat-label">Tahun Aktif</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" id="cnt-transaksi">0+</span>
+      <span class="stat-label">Transaksi</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">100%</span>
+      <span class="stat-label">Trust Rate</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">24/7</span>
+      <span class="stat-label">Available</span>
+    </div>
+  </div>
+
+  <!-- LAYANAN -->
+  <section class="services">
+    <p class="sec-label">Layanan</p>
+    <div class="service-grid">
+      <div class="service-card" onclick="copyInfo('Jual/Beli Akun Game')">
+        <span class="s-icon">🎮</span>
+        <div class="s-title">Jual / Beli Akun Game</div>
+        <div class="s-desc">Transaksi aman · Harga terbaik · Semua platform</div>
+      </div>
+      <div class="service-card" onclick="copyInfo('Rekber Akun Game')">
+        <span class="s-icon">🔒</span>
+        <div class="s-title">Rekber Akun Game</div>
+        <div class="s-desc">Middleman terpercaya · Anti scam · Proses cepat</div>
+      </div>
+      <div class="service-card" onclick="copyInfo('Rekber Isian')">
+        <span class="s-icon">💳</span>
+        <div class="s-title">Rekber Isian</div>
+        <div class="s-desc">Admin isian berpengalaman · Sejak era Valdez 2021</div>
+      </div>
+      <div class="service-card highlight" onclick="copyInfo('Open CV Saldo Termurah')">
+        <span class="s-icon">⚡</span>
+        <div class="s-title">Open CV Saldo</div>
+        <div class="s-desc">TERMURAH · Proses instan · Hubungi sekarang</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROFILE -->
+  <section class="profile-section">
+    <p class="sec-label">Profil</p>
+    <div class="profile-card">
+      <div class="avatar">66</div>
+      <div class="profile-info">
+        <div class="profile-name">Andra / Dian</div>
+        <div class="profile-handle">diantzy</div>
+        <div class="profile-meta">
+          <span class="meta-pill active">Admin Isian</span>
+          <span class="meta-pill active">Middleman</span>
+          <span class="meta-pill">Bandar Lampung</span>
+          <span class="meta-pill">Since 2021</span>
+          <span class="meta-pill">Era Valdez</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INFO -->
+  <section class="info-section">
+    <p class="sec-label">Informasi</p>
+    <div class="info-card">
+      <div class="info-row">
+        <span class="info-key">Platform</span>
+        <span class="info-val"><a href="https://sociabuzz.com/dianqtt" target="_blank">sociabuzz.com/dianqtt</a></span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Email</span>
+        <span class="info-val"><a href="mailto:kingandraa@gmail.com">kingandraa@gmail.com</a></span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Jam Operasional</span>
+        <span class="info-val" style="color:var(--accent)">24 Jam · 7 Hari</span>
+      </div>
+      <div class="info-row">
+        <span class="info-key">Status</span>
+        <span class="info-val" style="color:#4ade80">● Online & Siap Melayani</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-card">
+      <div class="cta-title">Siap Bertransaksi? 🚀</div>
+      <div class="cta-sub">Hubungi DIANTZY sekarang untuk transaksi aman,<br>cepat, dan terpercaya. Open 24 jam tanpa libur.</div>
+      <div class="cta-buttons">
+        <a href="https://sociabuzz.com/dianqtt" target="_blank" class="btn btn-accent">Kunjungi Sociabuzz</a>
+        <a href="mailto:kingandraa@gmail.com" class="btn btn-outline">Kirim Email</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2026 DIANTZY · Bandar Lampung</span>
+    <span>Trusted Since 2021 ⚡</span>
+  </footer>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✓ Info disalin!</div>
+
+<script>
+// Counter animation
+function animateCount(el, target, suffix='', duration=1500){
+  let start=0, step=target/60;
+  const timer=setInterval(()=>{
+    start+=step;
+    if(start>=target){start=target;clearInterval(timer)}
+    el.textContent=Math.floor(start)+(suffix);
+  },duration/60);
+}
+
+window.addEventListener('load',()=>{
+  const yr = new Date().getFullYear()-2021;
+  animateCount(document.getElementById('cnt-tahun'), yr, '+');
+  animateCount(document.getElementById('cnt-transaksi'), 500, '+');
+});
+
+// Copy toast
+function copyInfo(text){
+  const t=document.getElementById('toast');
+  t.textContent='✓ '+text+' — info disalin!';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+  try{navigator.clipboard.writeText(text)}catch(e){}
+}
+</script>
+</body>
+</html>
